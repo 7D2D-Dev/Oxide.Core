@@ -225,6 +225,26 @@ namespace Oxide.Core
 
             LogInfo("Loading Oxide Core v{0}...", Version);
 
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                if (!CommandLine.HasVariable("ignore-term-warning"))
+                {
+                    string term = Environment.GetEnvironmentVariable("TERM")?.ToLowerInvariant();
+
+                    switch (term)
+                    {
+                        case "screen":
+                        case "xterm":
+                            break;
+
+                        default:
+                            LogWarning($"Terminal {term} has been detected, plugin compiler may not work as expected.");
+                            LogWarning("If you are using LGSM please refer to https://github.com/GameServerManagers/LinuxGSM/issues/4267");
+                            break;
+                    }
+                }
+            }
+
             RootPluginManager = new PluginManager(RootLogger) { ConfigPath = ConfigDirectory };
             extensionManager = new ExtensionManager(RootLogger);
             DataFileSystem = new DataFileSystem(DataDirectory);
